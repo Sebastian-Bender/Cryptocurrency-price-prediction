@@ -8,8 +8,8 @@ def days_since_last_update(date):
 	today = datetime.datetime.now().date()
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
 	days = (today - date).days
-	#if days == 0:
-	#	return 1
+	if days == 0:
+		return 1
 	return days
 
 def get_data(coin, date):
