@@ -1,0 +1,7 @@
+__pycache__/
+env/
+.ipynb_checkpoints
+input/
+DB_login.txt
+login_DB.txt
+*.pyc
