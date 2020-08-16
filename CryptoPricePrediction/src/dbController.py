@@ -83,14 +83,12 @@ def updateDB_forex():
 
 	query = sqlalchemy.select([forex_data]).order_by(sqlalchemy.desc(forex_data.columns.time)).limit(1)
 	result = conn.execute(query).fetchall()
-	print(result)
+	
 	eur = apiController.get_forex_dataframe('EUR', '2017-01-01')
 	chf = apiController.get_forex_dataframe('CHF', '2017-01-01')
 	cad = apiController.get_forex_dataframe('CAD', '2017-01-01')
 
 	forex = pd.concat([eur, chf, cad], axis=1)
-	print('forex')
-	print(forex)
 	forex.to_sql('forex_data', con = engine, if_exists='append', chunksize = 1000, index=False)
 
 	returnStr =  'forex DB has successfully been initiated with values since 2017-01-01'
