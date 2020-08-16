@@ -26,3 +26,37 @@ def get_trimmed_dataframe(coin, date):
 	df[f'{coin}_value'] = df[['close', 'high', 'low', 'open']].mean(axis = 1)
 	df.rename(columns={'volumeto' : f'{coin}_volume'}, inplace=True)
 	return df[[f'{coin}_value', f'{coin}_volume']]
+
+def get_forex_dataframe(symbol, date):
+	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+	oneDay = datetime.timedelta(days = 1)
+	today = datetime.datetime.now().date()
+	
+	start = (date - oneDay - oneDay).strftime('%Y-%m-%d')
+	end = today.strftime('%Y-%m-%d')
+
+	url = f"https://api.exchangeratesapi.io/history?start_at={start}&end_at={end}&base=USD&symbols={symbol}"
+	r = requests.get(url)
+	hist_rates = r.json()
+
+	rates_by_date = hist_rates['rates']
+	# Convert the dictionary into desired format
+	hist_data = []
+	for key, value in rates_by_date.items():
+		hist_dict = {'date': key, symbol: value[symbol]}
+		hist_data.append(hist_dict)
+
+	hist_data.sort(key = lambda x:x['date'])
+
+	df = pd.DataFrame.from_dict(hist_data)
+	
+	df.set_index('date', inplace=True)
+	df.rename(columns={'date' : 'time'}, inplace=True)
+	idx = pd.date_range(start, end)
+
+	df.index = pd.DatetimeIndex(df.index)
+	df = df.reindex(idx)
+
+	df[symbol] = df[symbol].interpolate(method='slinear').interpolate(method='linear')
+	df = df.round(5)
+	return df[df.index >= '2017']
