@@ -7,8 +7,8 @@ import math
 def days_since_last_update(date):
 	today = datetime.datetime.now().date()
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-	days = (today - date).days
-	if days == 0:
+	days = (today - date).days - 1
+	if days <= 0:
 		return 1
 	return days
 
@@ -28,6 +28,7 @@ def get_trimmed_dataframe(coin, date):
 	return df[[f'{coin}_value', f'{coin}_volume']]
 
 def get_forex_dataframe(symbol, date):
+	safedDate = date
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
 	oneDay = datetime.timedelta(days = 1)
 	today = datetime.datetime.now().date()
@@ -50,8 +51,8 @@ def get_forex_dataframe(symbol, date):
 
 	df = pd.DataFrame.from_dict(hist_data)
 	
-	df.set_index('date', inplace=True)
 	df.rename(columns={'date' : 'time'}, inplace=True)
+	df.set_index('time', inplace=True)
 	idx = pd.date_range(start, end)
 
 	df.index = pd.DatetimeIndex(df.index)
@@ -59,4 +60,5 @@ def get_forex_dataframe(symbol, date):
 
 	df[symbol] = df[symbol].interpolate(method='slinear').interpolate(method='linear')
 	df = df.round(5)
-	return df[df.index >= '2017']
+	df = df[df.index <= end]
+	return df[df.index >= safedDate]

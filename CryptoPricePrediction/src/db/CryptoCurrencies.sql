@@ -14,11 +14,8 @@ CREATE TABLE coin_data (
 
     
 CREATE TABLE forex_data (
-	id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	time date, 
+	time date NOT NULL PRIMARY KEY, 
     EUR decimal(10, 5), 
     CHF decimal(10, 5), 
     CAD decimal(10, 5));
     
-UPDATE forex_data
-SET time = DATE_ADD("2016-12-31", INTERVAL id DAY);

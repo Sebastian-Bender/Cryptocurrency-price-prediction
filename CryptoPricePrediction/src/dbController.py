@@ -70,7 +70,7 @@ def readDB():
 	conn = engine.connect()
 
 	df = pd.read_sql('SELECT * FROM coin_data', con = engine)
-
+	df.set_index('time', inplace=True)
 	closeDB(conn, engine)
 	return df
 
@@ -83,26 +83,47 @@ def updateDB_forex():
 
 	query = sqlalchemy.select([forex_data]).order_by(sqlalchemy.desc(forex_data.columns.time)).limit(1)
 	result = conn.execute(query).fetchall()
-	
-	eur = apiController.get_forex_dataframe('EUR', '2017-01-01')
-	chf = apiController.get_forex_dataframe('CHF', '2017-01-01')
-	cad = apiController.get_forex_dataframe('CAD', '2017-01-01')
+	if result == []:
+		eur = apiController.get_forex_dataframe('EUR', '2017-01-01')
+		chf = apiController.get_forex_dataframe('CHF', '2017-01-01')
+		cad = apiController.get_forex_dataframe('CAD', '2017-01-01')
 
-	forex = pd.concat([eur, chf, cad], axis=1)
-	forex.to_sql('forex_data', con = engine, if_exists='append', chunksize = 1000, index=False)
+		forex = pd.concat([eur, chf, cad], axis=1)
+		forex.index.name = 'time'
+		forex.to_sql('forex_data', con = engine, if_exists='append', chunksize = 1000)
 
-	returnStr =  'forex DB has successfully been initiated with values since 2017-01-01'
+		returnStr =  'forex DB has successfully been initiated with values since 2017-01-01'
+	else:
+		print(result[0][0])
+		date = result[0][0] + datetime.timedelta(days = 1)
+
+		if date >= datetime.datetime.now().date():
+			closeDB(conn, engine)
+			return 'Forex DB already up to date'
+		date = date.strftime('%Y-%m-%d')
+
+
+		eur = apiController.get_forex_dataframe('EUR', date)
+		chf = apiController.get_forex_dataframe('CHF', date)
+		cad = apiController.get_forex_dataframe('CAD', date)
+
+		forex = pd.concat([eur, chf, cad], axis=1)
+		forex.index.name = 'time'
+		#
+		print(forex)
+		#
+		forex.to_sql('forex_data', con = engine, if_exists='append', chunksize = 1000)
+		
+		returnStr = f'Updated forex DB from {date} - today'
 	
 	closeDB(conn, engine)
 	return returnStr
-
-	closeDB(conn, engine)
 
 def readDB_forex():
 	engine = connectDB()
 	conn = engine.connect()
 
 	df = pd.read_sql('SELECT * FROM forex_data', con = engine)
-
+	df.set_index('time', inplace=True)
 	closeDB(conn, engine)
 	return df

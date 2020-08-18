@@ -12,10 +12,12 @@ print()
 
 print(df.tail())
 
-#status = dbController.updateDB_forex()
-
+status = dbController.updateDB_forex()
+print(status)
 forex = dbController.readDB_forex()
 
 print(forex)
 
-print("success")
+
+print('success')
+
