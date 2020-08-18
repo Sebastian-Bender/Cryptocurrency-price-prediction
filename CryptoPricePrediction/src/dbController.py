@@ -102,16 +102,12 @@ def updateDB_forex():
 			return 'Forex DB already up to date'
 		date = date.strftime('%Y-%m-%d')
 
-
 		eur = apiController.get_forex_dataframe('EUR', date)
 		chf = apiController.get_forex_dataframe('CHF', date)
 		cad = apiController.get_forex_dataframe('CAD', date)
 
 		forex = pd.concat([eur, chf, cad], axis=1)
 		forex.index.name = 'time'
-		#
-		print(forex)
-		#
 		forex.to_sql('forex_data', con = engine, if_exists='append', chunksize = 1000)
 		
 		returnStr = f'Updated forex DB from {date} - today'
