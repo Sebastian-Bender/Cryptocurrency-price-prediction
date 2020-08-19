@@ -13,129 +13,64 @@ df = dbController.readDB()
 dff = df.copy()
 
 
-btcVal = px.line(dff, x=dff.index, y='BTC_value', title='Bitcoin value')
-btcVal.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-btcVol = px.line(dff, x=dff.index, y='BTC_volume', title='Bitcoin Volume')
-btcVol.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-ethVal = px.line(dff, x=dff.index, y='ETH_value', title='Ethereum value')
-ethVal.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-ethVol = px.line(dff, x=dff.index, y='ETH_volume', title='Ethereum Volume')
-ethVol.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-ltcVal = px.line(dff, x=dff.index, y='LTC_value', title='Litecoin value')
-ltcVal.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-ltcVol = px.line(dff, x=dff.index, y='LTC_volume', title='Litecoin Volume')
-ltcVol.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-xrpVal = px.line(dff, x=dff.index, y='XRP_value', title='Ripple value')
-xrpVal.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
-xrpVol = px.line(dff, x=dff.index, y='XRP_volume', title='Ripple Volume')
-xrpVol.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1m", step="month", stepmode="backward"),
-            dict(count=6, label="6m", step="month", stepmode="backward"),
-            dict(count=1, label="YTD", step="year", stepmode="todate"),
-            dict(count=1, label="1y", step="year", stepmode="backward"),
-            dict(step="all")
-        ])
-    )
-)
-
 app.layout = html.Div(children = [
-    html.H1('CryptoCurrencies Dashboard'), 
-    dcc.Graph(figure=btcVal), 
-    dcc.Graph(figure=btcVol), 
-    dcc.Graph(figure=ethVal), 
-    dcc.Graph(figure=ethVol),
-    dcc.Graph(figure=ltcVal), 
-    dcc.Graph(figure=ltcVol),
-    dcc.Graph(figure=xrpVal), 
-    dcc.Graph(figure=xrpVol),
+    html.Div(children=[
+        html.H1('CryptoCurrencies Dashboard'), 
+    ], className='row'), 
+    html.Div(children=[
+        html.Div(children=[
+             dcc.Dropdown(
+                 id='coinselector', 
+                 options = [{'label':'Bitcoin', 'value': 'BTC'}, 
+                            {'label':'Ethereum', 'value': 'ETH'}, 
+                            {'label':'Litecoin', 'value': 'LTC'}, 
+                            {'label':'Ripple', 'value': 'XRP'}, 
+                 ], 
+                 value = 'BTC', 
+                 className='coinselector'
+             )
+        ], className='three columns div-user-controls'), 
+        html.Div(children=[
+            dcc.Graph(id='timeseries'), 
+            dcc.Graph(id='change'), 
+        ], className='nine columns'), 
+        
+    ], className='row')
 ])
+
+@app.callback(Output('timeseries', 'figure'), 
+              [Input('coinselector', 'value')])
+def update_timeseries(selected_dropdown_value):
+    coin = selected_dropdown_value
+    print(coin)
+    fig  = px.line(dff, x=dff.index, y=f'{coin}_value')
+    fig.update_layout(hovermode='x')
+    fig.update_xaxes(
+        rangeslider = dict(
+            visible = True,
+        ),
+        type = 'date', 
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(step="all")
+            ])
+        )
+    )
+
+    return fig
+
+@app.callback(Output('change', 'figure'), 
+              [Input('coinselector', 'value')])
+def update_changes(selected_dropdown_value):
+    coin = selected_dropdown_value
+    diffs = dff.diff()
+    fig = px.bar(diffs, x=diffs.index, y = f'{coin}_value')
+    fig.update_layout(hovermode='x')
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
