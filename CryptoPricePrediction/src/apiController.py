@@ -4,22 +4,49 @@ import time
 import datetime
 import math
 
-def days_since_last_update(date):
+def get_data(coin, date):
+	"""Helper-function. Gets the data from the cryptocompare api
+
+	Parameters
+	----------
+	coin : str
+		Symbol of the coin to request (eg BTC for Bitcoin)
+	date : str
+		start date
+
+	Returns
+	-------
+	ipdata
+	"""
 	today = datetime.datetime.now().date()
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-	days = (today - date).days - 1
+	days = (today - date).days
 	if days <= 0:
-		return 1
-	return days
-
-def get_data(coin, date):
-	days = days_since_last_update(date)
+		days = 1
+	
 	url = f"https://min-api.cryptocompare.com/data/histoday?fsym={coin}&tsym=USD&limit={days}"
 	r = requests.get(url)
 	ipdata = r.json()
+	print(ipdata)
+	print(type(ipdata))
 	return ipdata
 
 def get_trimmed_dataframe(coin, date):
+	"""Gets the data from the get_data function and returns a dataframe
+	that contains only the needed columns
+
+	Parameters
+	----------
+	coin : str
+		Symbol of the coin to request (eg BTC for Bitcoin)
+	date : str
+		start date
+
+	Returns
+	-------
+	df : DataFrame
+		DataFrame containing the needed columns
+	"""
 	df = pd.DataFrame(get_data(coin, date)['Data'])
 	df.time = pd.to_datetime(df.time, unit = 's')
 	df.set_index('time', inplace=True)
@@ -28,6 +55,20 @@ def get_trimmed_dataframe(coin, date):
 	return df[[f'{coin}_value', f'{coin}_volume']]
 
 def get_forex_dataframe(symbol, date):
+	"""Gets the data from the exchangeratesapi API and returns a dataframe.
+
+	Parameters
+	----------
+	symbol : str
+		Symbol of the currency to request (eg EUR for Euro)
+	date : str
+		start date
+
+	Returns
+	-------
+	df : DataFrame
+		DataFrame containing the exchange rates from USD to (symbol) per day starting from (date)
+	"""
 	safedDate = date
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
 	oneDay = datetime.timedelta(days = 1)

@@ -7,6 +7,13 @@ import apiController
 from apiController import get_trimmed_dataframe
 
 def connectDB():
+	"""Connects to the database with the login information contained
+	in the login_DB.txt.
+	Returns
+	-------
+	engine
+		sqlalchemy engine
+	"""
 	with open('login_DB.txt') as f:
 		lines = f.read().splitlines()
 	engine = sqlalchemy.create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}".format(user = lines[0], pw = lines[1], db = lines[2]))
@@ -14,12 +21,25 @@ def connectDB():
 	return engine
 
 def closeDB(conn, engine):
+	"""Closes the connection to the database.
+	Parameters
+	----------
+	conn
+	engine
+	"""
 	conn.close()
 	engine.dispose()
 	print('DB connection has been closed')
 
 
 def updateDB():
+	"""Updates the coin_data table in the database
+
+	Returns
+	-------
+	returnStr : str
+		information on what has been updated
+	"""
 	returnStr = ''
 	engine = connectDB()
 
@@ -66,6 +86,13 @@ def updateDB():
 	return returnStr
 
 def readDB():
+	"""Reads the coin_data table in the database
+
+	Returns
+	-------
+	df : pandas DataFrame
+		DataFrame with all entries of the coin_data table
+	"""
 	engine = connectDB()
 	conn = engine.connect()
 
@@ -75,6 +102,13 @@ def readDB():
 	return df
 
 def updateDB_forex():
+	"""Updates the forex_data table in the database
+
+	Returns
+	-------
+	returnStr : str
+		information on what has been updated
+	"""
 	returnStr = ''
 	engine = connectDB()
 	conn = engine.connect()
@@ -116,6 +150,13 @@ def updateDB_forex():
 	return returnStr
 
 def readDB_forex():
+	"""Reads the forex_data table in the database
+
+	Returns
+	-------
+	df : pandas DataFrame
+		DataFrame with all entries of the forex_data table
+	"""
 	engine = connectDB()
 	conn = engine.connect()
 
