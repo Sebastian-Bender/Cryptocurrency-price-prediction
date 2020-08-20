@@ -16,7 +16,8 @@ def get_data(coin, date):
 
 	Returns
 	-------
-	ipdata
+	ipdata : dict
+		column : value
 	"""
 	today = datetime.datetime.now().date()
 	date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -27,8 +28,6 @@ def get_data(coin, date):
 	url = f"https://min-api.cryptocompare.com/data/histoday?fsym={coin}&tsym=USD&limit={days}"
 	r = requests.get(url)
 	ipdata = r.json()
-	print(ipdata)
-	print(type(ipdata))
 	return ipdata
 
 def get_trimmed_dataframe(coin, date):
