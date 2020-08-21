@@ -8,4 +8,5 @@ Cryptocurrency price analysis and prediction for (BTC, ETH, LTC, XRP).
 ## Instructions
   - Execute db/CryptoCurrencies.sql
   - pip install requirements.txt
+  - create login_DB.txt file with your mySQL login information (username, password, database name seperated by lines) in the same directory as the dbController.py
   - python main.py # Update database
