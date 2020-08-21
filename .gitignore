@@ -5,3 +5,5 @@ input/
 DB_login.txt
 login_DB.txt
 *.pyc
+.vscode/
+.DS_Store
