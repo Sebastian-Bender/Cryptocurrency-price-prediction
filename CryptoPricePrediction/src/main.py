@@ -20,6 +20,7 @@ if __name__ == '__main__':
     print('1: Update Database')
     print('2: Read Database')
     print('3: Update and Read Database')
+    print('0: Quit')
 
     userInput = input('Enter: ')
     if userInput == '1':
@@ -29,6 +30,8 @@ if __name__ == '__main__':
     elif userInput == '3':
         update_database()
         read_database()
+    elif userInput == '0':
+        exit
 
 
 
